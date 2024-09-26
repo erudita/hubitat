@@ -26,6 +26,8 @@ metadata {
             input name: "tahomaPin", type: "password", title: "PIN", required: true
             input name: "tahomaHost", type: "text", title: "Host", required: false
             
+            input name: "overkizHost", title: "Registration Region", type: "enum", options:[["ha101-1.overkiz.com":"Europe, ME, Africa"], ["Asia Pacific":"ha201-1.overkiz.com"], ["North America":"ha401-1.overkiz.com"], defaultValue: "ha201-1.overkiz.com", required: true
+
             input name: "logLevel", title: "Log Level", type: "enum", options: LOG_LEVELS, defaultValue: DEFAULT_LOG_LEVEL, required: false
             input name: "stateCheckIntervalMinutes", title: "State Check Interval", type: "enum", options:[[0:"Disabled"], [30:"30min"], [60:"1h"], [120:"2h"], [180:"3h"], [240:"4h"], [360:"6h"], [480:"8h"], [720: "12h"]], defaultValue: 720, required: true
         }
@@ -307,7 +309,7 @@ private getExistingToken() {
 
 private getAvailableTokens() {
     def params = [
-        uri: "https://ha101-1.overkiz.com/enduser-mobile-web/enduserAPI/config/${tahomaPin}/local/tokens/devmode",
+        uri: "https://$overkizHost/enduser-mobile-web/enduserAPI/config/${tahomaPin}/local/tokens/devmode",
         headers: ["Content-Type": "application/json", "Cookie": "JSESSIONID=${state.sessionId}"]
     ]
     
@@ -325,7 +327,7 @@ private getAvailableTokens() {
 
 private generateToken() {
     def params = [
-        uri: "https://ha101-1.overkiz.com/enduser-mobile-web/enduserAPI/config/${tahomaPin}/local/tokens/generate",
+        uri: "https://$overkizHost/enduser-mobile-web/enduserAPI/config/${tahomaPin}/local/tokens/generate",
         headers: ["Content-Type": "application/json", "Cookie": "JSESSIONID=${state.sessionId}"]
     ]
     
@@ -349,7 +351,7 @@ private generateToken() {
 
 private deleteToken(id) {
     def params = [
-        uri: "https://ha101-1.overkiz.com/enduser-mobile-web/enduserAPI/config/${tahomaPin}/local/tokens/${id}",
+        uri: "https://$overkizHost/enduser-mobile-web/enduserAPI/config/${tahomaPin}/local/tokens/${id}",
         headers: ["Content-Type": "application/json", "Cookie": "JSESSIONID=${state.sessionId}"]
     ]
     
@@ -369,7 +371,7 @@ def getTokenLabel() {
 
 private activateToken(tokenId) {
     def params = [
-        uri: "https://ha101-1.overkiz.com",
+        uri: "https://$overkizHost",
         path: "/enduser-mobile-web/enduserAPI/config/${tahomaPin}/local/tokens",
         headers: ["Content-Type": "application/json", "Cookie": "JSESSIONID=${state.sessionId}"],
         body: '{ "label": "' + getTokenLabel() + '", "token": "' + tokenId + '", "scope": "devmode" }'
@@ -389,7 +391,7 @@ private activateToken(tokenId) {
 
 private createNewSession() {
     def params = [
-        uri: "https://ha101-1.overkiz.com",
+        uri: "https://$overkizHost",
         path: "/enduser-mobile-web/enduserAPI/login",
         headers: ["Content-Type": "application/x-www-form-urlencoded"],
         body: "userId=" + URLEncoder.encode(tahomaUsername, "UTF-8") + "&" + "userPassword=" + URLEncoder.encode(tahomaPassword, "UTF-8")
